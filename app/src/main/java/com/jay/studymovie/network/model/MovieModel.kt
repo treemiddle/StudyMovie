@@ -2,6 +2,7 @@ package com.jay.studymovie.network.model
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import com.jay.studymovie.ui.base.Identifiable
 
 data class MovieModel(
     @SerializedName("title")
@@ -35,6 +36,7 @@ data class MovieModel(
     @SerializedName("userRating")
     @Expose
     val userRating: String
-) : Model {
-
+) : Model, Identifiable {
+    override val identifier: Any
+        get() = title
 }
