@@ -1,4 +1,4 @@
-package com.jay.studymovie.ui
+package com.jay.studymovie.ui.main
 
 import android.content.Intent
 import android.net.Uri
