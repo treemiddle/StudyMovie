@@ -1,13 +1,13 @@
 package com.jay.studymovie.ui
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import com.jay.studymovie.R
@@ -68,10 +68,6 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
     }
 
-    private fun onMovieClick(item: MovieModel) {
-        Toast.makeText(this, "$item", Toast.LENGTH_SHORT).show()
-    }
-
     private fun showLoading() {
         progressbar.visibility = View.VISIBLE
     }
@@ -80,17 +76,19 @@ class MainActivity : AppCompatActivity() {
         progressbar.visibility = View.INVISIBLE
     }
 
+    private fun onMovieClick(item: MovieModel) = startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(item.link)))
+
     private fun queryTexListener() = etQuery.addTextChangedListener { _querySubject.onNext(it.toString()) }
 
     private fun onSearchClick() = btnSearch.setOnClickListener { _searhClickSubject.onNext(Unit) }
 
     private fun bindRx() {
         val query = _querySubject.debounce(700, TimeUnit.MILLISECONDS)
-            .filter { it.length >= 2 }
         val button = _searhClickSubject.throttleFirst(1, TimeUnit.SECONDS)
-            .map { _querySubject.value ?: "" }
+            .map { _querySubject.value }
 
         Observable.merge(query, button)
+            .filter { it.length >= 2 }
             .distinctUntilChanged()
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { showLoading() }
