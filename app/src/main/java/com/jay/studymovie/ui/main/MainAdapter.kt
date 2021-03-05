@@ -1,4 +1,4 @@
-package com.jay.studymovie.ui
+package com.jay.studymovie.ui.main
 
 import android.view.LayoutInflater
 import android.view.View
