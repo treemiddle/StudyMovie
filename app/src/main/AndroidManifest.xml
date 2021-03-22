@@ -27,6 +27,7 @@
             android:name=".ui.login.LoginActivity"
             android:theme="@style/Theme.StudyMovie"
             android:launchMode="singleTop"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize"
             android:exported="false" />
 
         <activity

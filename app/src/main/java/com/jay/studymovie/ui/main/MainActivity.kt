@@ -11,9 +11,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import com.jay.studymovie.R
-import com.jay.studymovie.network.NetworkService
+import com.jay.studymovie.network.NetworkServiceImpl
 import com.jay.studymovie.network.model.MovieModel
 import com.jay.studymovie.network.model.response.NaverSearchResponse
+import com.jay.studymovie.ui.base.BaseActivity
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -23,7 +24,7 @@ import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 import java.util.concurrent.TimeUnit
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     private val TAG = javaClass.simpleName
 
     private val compositeDisposable: CompositeDisposable by lazy(::CompositeDisposable)
@@ -68,14 +69,6 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
     }
 
-    private fun showLoading() {
-        progressbar.visibility = View.VISIBLE
-    }
-
-    private fun hideLoading() {
-        progressbar.visibility = View.INVISIBLE
-    }
-
     private fun onMovieClick(item: MovieModel) = startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(item.link)))
 
     private fun queryTexListener() = etQuery.addTextChangedListener { _querySubject.onNext(it.toString()) }
@@ -92,7 +85,7 @@ class MainActivity : AppCompatActivity() {
             .distinctUntilChanged()
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { showLoading() }
-            .switchMapSingle(NetworkService.movieApi::getSearchMovie)
+            .switchMapSingle(requireApplication().networkService.movieApi::getSearchMovie)
             .map(NaverSearchResponse<MovieModel>::items)
             .onErrorReturn { listOf() }
             .observeOn(AndroidSchedulers.mainThread())
