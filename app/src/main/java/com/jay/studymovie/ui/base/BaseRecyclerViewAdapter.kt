@@ -2,7 +2,9 @@ package com.jay.studymovie.ui.base
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.jay.studymovie.network.model.Model
+import com.jay.studymovie.data.remote.model.Model
+import com.jay.studymovie.ui.main.model.JayMoviePresentation
+import com.jay.studymovie.ui.model.JayPresentation
 
 typealias OnRecyclerViewItemClick<E> = ((E) -> Unit)
 
@@ -14,7 +16,7 @@ abstract class BaseRecyclerViewAdapter<E, VH> : ListAdapter<E, VH>(object : Diff
     override fun areContentsTheSame(oldItem: E, newItem: E): Boolean {
         return oldItem == newItem
     }
-}) where E : Identifiable, E : Model, VH : BaseViewHolder {
+}) where E : Identifiable, E : JayPresentation, VH : BaseViewHolder {
 
     @Suppress("UNCHECKED_CAST")
     override fun onBindViewHolder(holder: VH, position: Int) {
