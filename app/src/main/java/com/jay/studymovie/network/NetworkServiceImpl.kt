@@ -4,8 +4,6 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import com.jay.studymovie.BuildConfig
-import com.jay.studymovie.network.api.JAuthApi
-import com.jay.studymovie.network.api.JAuthApiImpl
 import com.jay.studymovie.network.api.NaverApi
 import com.jay.studymovie.network.interceptor.NaverAuthInterceptor
 import io.reactivex.schedulers.Schedulers
@@ -17,10 +15,6 @@ class NetworkServiceImpl : NetworkService {
 
     override val movieApi: NaverApi by lazy {
         retrofit.create(NaverApi::class.java)
-    }
-
-    override val authApi: JAuthApi by lazy {
-        JAuthApiImpl()
     }
 
     private val authInterceptor: NaverAuthInterceptor by lazy {

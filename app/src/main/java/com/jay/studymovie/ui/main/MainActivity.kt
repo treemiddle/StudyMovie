@@ -25,8 +25,6 @@ import io.reactivex.subjects.Subject
 import java.util.concurrent.TimeUnit
 
 class MainActivity : BaseActivity() {
-    private val TAG = javaClass.simpleName
-
     private val compositeDisposable: CompositeDisposable by lazy(::CompositeDisposable)
     private val _querySubject: BehaviorSubject<String> = BehaviorSubject.createDefault("")
     private val _searhClickSubject: Subject<Unit> = PublishSubject.create()
