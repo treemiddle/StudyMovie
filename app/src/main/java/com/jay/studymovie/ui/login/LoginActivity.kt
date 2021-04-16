@@ -115,8 +115,6 @@ class LoginActivity : BaseActivity() {
     }
 
     private fun routeMovieSearch() {
-        requireApplication().preferencesHelper.authLogin = false
-
         startActivity(Intent(application, MainActivity::class.java))
         finish()
     }

@@ -3,18 +3,19 @@ package com.jay.studymovie.ui.main
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.RecyclerView
 import com.jay.studymovie.R
-import com.jay.studymovie.network.NetworkServiceImpl
-import com.jay.studymovie.network.model.MovieModel
-import com.jay.studymovie.network.model.response.NaverSearchResponse
+import com.jay.studymovie.data.remote.model.MovieModel
+import com.jay.studymovie.data.remote.model.response.NaverSearchResponse
 import com.jay.studymovie.ui.base.BaseActivity
+import com.jay.studymovie.ui.main.mapper.JayMoviePresentationMapper
+import com.jay.studymovie.ui.main.model.JayMoviePresentation
+import io.reactivex.BackpressureStrategy
+import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -67,7 +68,7 @@ class MainActivity : BaseActivity() {
         recyclerView.adapter = adapter
     }
 
-    private fun onMovieClick(item: MovieModel) = startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(item.link)))
+    private fun onMovieClick(item: JayMoviePresentation) = startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(item.link)))
 
     private fun queryTexListener() = etQuery.addTextChangedListener { _querySubject.onNext(it.toString()) }
 
@@ -75,20 +76,24 @@ class MainActivity : BaseActivity() {
 
     private fun bindRx() {
         val query = _querySubject.debounce(700, TimeUnit.MILLISECONDS)
+            .toFlowable(BackpressureStrategy.DROP)
         val button = _searhClickSubject.throttleFirst(1, TimeUnit.SECONDS)
             .map { _querySubject.value }
+            .toFlowable(BackpressureStrategy.DROP)
 
-        Observable.merge(query, button)
+        Flowable.merge(query, button)
             .filter { it.length >= 2 }
             .distinctUntilChanged()
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { showLoading() }
-            .switchMapSingle(requireApplication().networkService.movieApi::getSearchMovie)
-            .map(NaverSearchResponse<MovieModel>::items)
+            .switchMap(requireApplication().movieRepository::getMovies)
+            .map { it.map(JayMoviePresentationMapper::mapToPresentation) }
             .onErrorReturn { listOf() }
             .observeOn(AndroidSchedulers.mainThread())
             .doOnNext { hideLoading() }
-            .subscribe(adapter::submitList)
+            .subscribe(adapter::submitList) {
+                it.printStackTrace()
+            }
             .addTo(compositeDisposable)
     }
 

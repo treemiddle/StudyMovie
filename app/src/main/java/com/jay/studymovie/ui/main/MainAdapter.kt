@@ -9,15 +9,16 @@ import android.widget.TextView
 import androidx.core.text.HtmlCompat
 import com.bumptech.glide.Glide
 import com.jay.studymovie.R
-import com.jay.studymovie.network.model.MovieModel
+import com.jay.studymovie.data.remote.model.MovieModel
 import com.jay.studymovie.ui.base.BaseRecyclerViewAdapter
 import com.jay.studymovie.ui.base.BaseViewHolder
 import com.jay.studymovie.ui.base.OnRecyclerViewItemClick
 import com.jay.studymovie.ui.base.ViewHolderLifecycle
+import com.jay.studymovie.ui.main.model.JayMoviePresentation
 
 class MainAdapter(
-    private val onItemClick: OnRecyclerViewItemClick<MovieModel>? = null
-) : BaseRecyclerViewAdapter<MovieModel, MainAdapter.ItemViewHolder>() {
+    private val onItemClick: OnRecyclerViewItemClick<JayMoviePresentation>? = null
+) : BaseRecyclerViewAdapter<JayMoviePresentation, MainAdapter.ItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         return ItemViewHolder.from(parent).also {
@@ -32,7 +33,7 @@ class MainAdapter(
         }
     }
 
-    class ItemViewHolder(itemView: View) : BaseViewHolder(itemView), ViewHolderLifecycle<MovieModel> {
+    class ItemViewHolder(itemView: View) : BaseViewHolder(itemView), ViewHolderLifecycle<JayMoviePresentation> {
         private val ivPoster: ImageView = itemView.findViewById(R.id.iv_poster)
         private val tvTitle: TextView = itemView.findViewById(R.id.tv_title)
         private val rbStar: RatingBar = itemView.findViewById(R.id.rb_star)
@@ -40,15 +41,17 @@ class MainAdapter(
         private val tvDirector: TextView = itemView.findViewById(R.id.tv_director)
         private val tvActor: TextView = itemView.findViewById(R.id.tv_actor)
 
-        override fun bind(item: MovieModel) {
+        override fun bind(item: JayMoviePresentation) {
             Glide.with(ivPoster)
                 .load(item.image)
                 .error(R.drawable.ic_error)
                 .placeholder(R.drawable.ic_load)
                 .into(ivPoster)
 
-            tvTitle.text = HtmlCompat.fromHtml(item.title, HtmlCompat.FROM_HTML_MODE_COMPACT)
-            rbStar.rating = (item.userRating.toFloatOrNull() ?: 0f) / 2
+            //tvTitle.text = HtmlCompat.fromHtml(item.title, HtmlCompat.FROM_HTML_MODE_COMPACT)
+            //rbStar.rating = (item.userRating.toFloatOrNull() ?: 0f) / 2
+            tvTitle.text = item.title
+            rbStar.rating = item.userRating
             tvPublishDate.text = item.pubDate
             tvDirector.text = item.director
             tvActor.text = item.actor

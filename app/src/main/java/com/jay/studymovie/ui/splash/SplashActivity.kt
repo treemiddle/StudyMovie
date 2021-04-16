@@ -29,7 +29,7 @@ class SplashActivity : BaseActivity() {
         Observable.timer(2, TimeUnit.SECONDS)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
-                if (requireApplication().preferencesHelper.authLogin) {
+                if (requireApplication().authRepository.autoLogin) {
                     login()
                 } else {
                     main()

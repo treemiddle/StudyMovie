@@ -2,10 +2,17 @@ package com.jay.studymovie.ui.application
 
 import android.app.Application
 import android.util.Log
-import com.jay.studymovie.network.NetworkService
-import com.jay.studymovie.network.NetworkServiceImpl
-import com.jay.studymovie.utils.prefs.PreferencesHelper
-import com.jay.studymovie.utils.prefs.PreferencesHelperImpl
+import com.facebook.stetho.Stetho
+import com.jay.studymovie.data.AuthRepositoryImpl
+import com.jay.studymovie.data.MovieRepositoryImpl
+import com.jay.studymovie.data.local.JayDatabase
+import com.jay.studymovie.data.remote.NetworkServiceImpl
+import com.jay.studymovie.data.local.prefs.PreferencesHelperImpl
+import com.jay.studymovie.data.local.source.JayAuthLocalDataSourceImpl
+import com.jay.studymovie.data.local.source.JayMovieLocalDataSourceImpl
+import com.jay.studymovie.data.remote.source.JayMovieRemoteDataSourceImpl
+import com.jay.studymovie.domain.repository.JayAuthRepository
+import com.jay.studymovie.domain.repository.JayMovieRepository
 import com.uber.rxdogtag.RxDogTag
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
@@ -14,17 +21,45 @@ import java.net.SocketException
 
 class JApplication : Application() {
     private val TAG = javaClass.simpleName
-    lateinit var preferencesHelper: PreferencesHelper
-    lateinit var networkService: NetworkService
+
+    lateinit var movieRepository: JayMovieRepository
+    lateinit var authRepository: JayAuthRepository
 
     override fun onCreate() {
         super.onCreate()
 
+        Stetho.initializeWithDefaults(this)
+        inject()
         RxDogTag.install()
         rxErrorHandler()
+    }
 
-        preferencesHelper = PreferencesHelperImpl(applicationContext)
-        networkService = NetworkServiceImpl()
+    private fun inject() {
+        val prefHelper = PreferencesHelperImpl(applicationContext)
+        val database = JayDatabase.Factory.create(applicationContext)
+        val networkService = NetworkServiceImpl()
+
+        val authLocalDataSource = JayAuthLocalDataSourceImpl(
+            prefHelper
+        )
+
+        val movieLocalDataSource = JayMovieLocalDataSourceImpl(
+            prefHelper,
+            database.movieDao
+        )
+
+        val movieRemoteDataSource = JayMovieRemoteDataSourceImpl(
+            networkService.movieApi
+        )
+
+        authRepository = AuthRepositoryImpl(
+            authLocalDataSource
+        )
+
+        movieRepository = MovieRepositoryImpl(
+            movieLocalDataSource,
+            movieRemoteDataSource
+        )
     }
 
     private fun rxErrorHandler() {
