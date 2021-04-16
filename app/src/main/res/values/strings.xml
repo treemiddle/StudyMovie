@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">dev_wj</string>
     <string name="main_btn_search">검색</string>
+    <string name="login_fail_id">존재하지 않는 사용자입니다</string>
+    <string name="login_fail_password">비밀번호가 틀렸습니다</string>
+    <string name="login_empty">아이디 또는 비밀번호를 입력해주세요</string>
 </resources>

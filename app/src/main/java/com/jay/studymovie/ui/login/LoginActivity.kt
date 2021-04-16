@@ -5,18 +5,19 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ProgressBar
+import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import com.google.android.material.textfield.TextInputEditText
-import com.jakewharton.retrofit2.adapter.rxjava2.HttpException
-import com.jakewharton.rxbinding3.view.clicks
-import com.jakewharton.rxbinding3.widget.textChanges
 import com.jay.studymovie.R
-import com.jay.studymovie.network.model.request.JAuthRequest
 import com.jay.studymovie.ui.base.BaseActivity
 import com.jay.studymovie.ui.main.MainActivity
-import io.reactivex.Observable
+import com.jay.studymovie.utils.ext.toast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
+import io.reactivex.subjects.Subject
 import java.util.concurrent.TimeUnit
 
 class LoginActivity : BaseActivity() {
@@ -27,6 +28,9 @@ class LoginActivity : BaseActivity() {
     private lateinit var loadingProgressBar: ProgressBar
 
     private val compositeDisposable: CompositeDisposable by lazy(::CompositeDisposable)
+    private val _idSubject: BehaviorSubject<String> = BehaviorSubject.createDefault("")
+    private val _passwordSubject: BehaviorSubject<String> = BehaviorSubject.createDefault("")
+    private val _loginSubject: Subject<Unit> = PublishSubject.create()
 
     override val progressView: View?
         get() = loadingProgressBar
@@ -36,6 +40,7 @@ class LoginActivity : BaseActivity() {
         setContentView(R.layout.activity_login)
 
         initView()
+        initListener()
         binxRx()
     }
 
@@ -51,58 +56,60 @@ class LoginActivity : BaseActivity() {
         loadingProgressBar = findViewById(R.id.pgb_loading)
     }
 
-    private fun binxRx() {
-        val idChanges = idInputEditText.textChanges()
-            .map(CharSequence::toString)
-        val pwChanges = passwordInputEditText.textChanges()
-            .map(CharSequence::toString)
-        val request = Observable.combineLatest(
-            idChanges,
-            pwChanges,
-            { id, password ->
-                JAuthRequest(id, password)
-            }
-        )
+    private fun initListener() {
+        idInputEditText.addTextChangedListener { idOnNext(it.toString()) }
+        passwordInputEditText.addTextChangedListener { passwordOnNext(it.toString()) }
+        loginButton.setOnClickListener { onLoginClick() }
+    }
 
-        loginButton.clicks()
-            .throttleFirst(1, TimeUnit.SECONDS, AndroidSchedulers.mainThread())
-            .doOnNext { clearError() }
-            .flatMap { request }
-            .doOnNext { showLoading() }
-            .switchMap {
-                requireApplication().networkService.authApi
-                    .postLogin(it)
-                    .toSingleDefault(Unit)
-                    .toObservable()
+    private fun binxRx() {
+        _loginSubject.throttleFirst(2, TimeUnit.SECONDS)
+            .map { _idSubject.value to _passwordSubject.value }
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { (id, password) ->
+                when {
+                    id.isNullOrEmpty() || password.isNullOrEmpty() -> {
+                        showError(500)
+                    }
+                    id != TEST_ID -> {
+                        showError(404)
+                    }
+                    password != TEST_PASSWORD -> {
+                        showError(409)
+                    }
+                    else -> {
+                        showError(200)
+                    }
+                }
             }
-            .doOnNext { hideLoading() }
-            .doOnError { hideLoading() }
-            .doOnError(this::showError)
-            .retry { error -> (error is HttpException) }
-            .subscribe { routeMovieSearch() }
             .addTo(compositeDisposable)
     }
+
+    private fun idOnNext(id: String) = _idSubject.onNext(id)
+
+    private fun passwordOnNext(password: String) = _passwordSubject.onNext(password)
+
+    private fun onLoginClick() = _loginSubject.onNext(Unit)
 
     private fun clearError() {
         idInputEditText.error = null
         passwordInputEditText.error = null
     }
 
-    private fun showError(throwable: Throwable) {
-        when (throwable) {
-            is HttpException -> when (throwable.code()) {
-                404 -> {
-                    idInputEditText.error = "존재히자 않는 사용자입니다"
-                }
-                409 -> {
-                    passwordInputEditText.error = "패스워드가 틀렸습니다"
-                }
-                else -> {
-                    clearError()
-                }
+    private fun showError(code: Int) {
+        when (code) {
+            200 -> {
+                clearError()
+                routeMovieSearch()
+            }
+            404 -> {
+                idInputEditText.error = getString(R.string.login_fail_id)
+            }
+            409 -> {
+                passwordInputEditText.error = getString(R.string.login_fail_password)
             }
             else -> {
-                clearError()
+                this.toast(getString(R.string.login_empty))
             }
         }
     }
@@ -114,4 +121,8 @@ class LoginActivity : BaseActivity() {
         finish()
     }
 
+    companion object {
+        private const val TEST_ID = "0000"
+        private const val TEST_PASSWORD = "0000"
+    }
 }
