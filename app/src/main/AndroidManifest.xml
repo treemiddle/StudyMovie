@@ -31,7 +31,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".ui.movie.MovieActivity"
             android:theme="@style/Theme.StudyMovie"
             android:exported="false"
             android:launchMode="singleTop" />

@@ -1,4 +1,4 @@
-package com.jay.studymovie.ui.main.model
+package com.jay.studymovie.ui.movie.model
 
 import com.jay.studymovie.ui.base.Identifiable
 import com.jay.studymovie.ui.model.JayPresentation

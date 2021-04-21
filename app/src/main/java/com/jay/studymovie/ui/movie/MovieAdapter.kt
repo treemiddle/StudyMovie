@@ -1,4 +1,4 @@
-package com.jay.studymovie.ui.main
+package com.jay.studymovie.ui.movie
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,19 +6,17 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
-import androidx.core.text.HtmlCompat
 import com.bumptech.glide.Glide
 import com.jay.studymovie.R
-import com.jay.studymovie.data.remote.model.MovieModel
 import com.jay.studymovie.ui.base.BaseRecyclerViewAdapter
 import com.jay.studymovie.ui.base.BaseViewHolder
 import com.jay.studymovie.ui.base.OnRecyclerViewItemClick
 import com.jay.studymovie.ui.base.ViewHolderLifecycle
-import com.jay.studymovie.ui.main.model.JayMoviePresentation
+import com.jay.studymovie.ui.movie.model.JayMoviePresentation
 
-class MainAdapter(
+class MovieAdapter(
     private val onItemClick: OnRecyclerViewItemClick<JayMoviePresentation>? = null
-) : BaseRecyclerViewAdapter<JayMoviePresentation, MainAdapter.ItemViewHolder>() {
+) : BaseRecyclerViewAdapter<JayMoviePresentation, MovieAdapter.ItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         return ItemViewHolder.from(parent).also {
