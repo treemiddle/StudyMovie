@@ -1,7 +1,7 @@
-package com.jay.studymovie.ui.main.mapper
+package com.jay.studymovie.ui.movie.mapper
 
 import com.jay.studymovie.domain.model.JayMovieModel
-import com.jay.studymovie.ui.main.model.JayMoviePresentation
+import com.jay.studymovie.ui.movie.model.JayMoviePresentation
 import com.jay.studymovie.ui.mapper.JayPresentationMapper
 import com.jay.studymovie.utils.ext.formatWith
 import com.jay.studymovie.utils.ext.toDateWith
