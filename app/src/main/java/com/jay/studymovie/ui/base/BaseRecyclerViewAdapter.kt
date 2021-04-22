@@ -2,30 +2,22 @@ package com.jay.studymovie.ui.base
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.jay.studymovie.ui.model.JayPresentation
 
-typealias OnRecyclerViewItemClick<E> = ((E) -> Unit)
-
-abstract class BaseRecyclerViewAdapter<E, VH> : ListAdapter<E, VH>(object : DiffUtil.ItemCallback<E>() {
-    override fun areItemsTheSame(oldItem: E, newItem: E): Boolean {
+abstract class BaseRecyclerViewAdapter<T : Identifiable> : ListAdapter<T, BaseViewHolder<T>>(object : DiffUtil.ItemCallback<T>() {
+    override fun areItemsTheSame(oldItem: T, newItem: T): Boolean {
         return oldItem.identifier == newItem.identifier
     }
 
-    override fun areContentsTheSame(oldItem: E, newItem: E): Boolean {
+    override fun areContentsTheSame(oldItem: T, newItem: T): Boolean {
         return oldItem == newItem
     }
-}) where E : Identifiable, E : JayPresentation, VH : BaseViewHolder {
+}) {
 
-    @Suppress("UNCHECKED_CAST")
-    override fun onBindViewHolder(holder: VH, position: Int) {
-        val currentItem = currentList.getOrNull(position) ?: return
-        (holder as? ViewHolderLifecycle<E>)?.bind(currentItem)
+    override fun onBindViewHolder(holder: BaseViewHolder<T>, position: Int) {
+        holder.bind(currentList[position])
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun onViewRecycled(holder: VH) {
-        super.onViewRecycled(holder)
-        (holder as? ViewHolderLifecycle<E>)?.recycle()
+    override fun onViewRecycled(holder: BaseViewHolder<T>) {
+        holder.recycle()
     }
-
 }

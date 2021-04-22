@@ -1,11 +1,12 @@
 package com.jay.studymovie.ui.splash
 
 import android.content.Intent
+import androidx.databinding.ViewDataBinding
 import com.jay.studymovie.ui.base.BaseActivity
 import com.jay.studymovie.ui.login.LoginActivity
 import com.jay.studymovie.ui.movie.MovieActivity
 
-class SplashActivity : BaseActivity<SplashPresenter>(), SplashContract.View {
+class SplashActivity : BaseActivity<ViewDataBinding, SplashPresenter>(), SplashContract.View {
     override val presenter: SplashPresenter by lazy {
         SplashPresenter(
             authRepository = requireApplication().authRepository,

@@ -1,91 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@drawable/bg_underline"
-    android:padding="16dp">
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guide_split"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:orientation="vertical"
-        app:layout_constraintGuide_begin="120dp" />
+    <data>
+        <variable
+            name="item"
+            type="com.jay.studymovie.ui.movie.model.JayMoviePresentation" />
+    </data>
 
-    <ImageView
-        android:id="@+id/iv_poster"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/guide_split"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="@drawable/bg_underline"
+        android:padding="16dp">
 
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:gravity="start|center_vertical"
-        android:maxLines="1"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guide_split"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="영화 제목" />
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guide_split"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="120dp" />
 
-    <RatingBar
-        android:id="@+id/rb_star"
-        style="@style/AppRatingBar.Small"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:isIndicator="true"
-        android:numStars="5"
-        android:stepSize="0.5"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toEndOf="@id/guide_split"
-        app:layout_constraintTop_toBottomOf="@id/tv_title" />
+        <ImageView
+            android:id="@+id/iv_poster"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY"
+            bind:imgSrc="@{item.image}"
+            bind:imgError="@{@drawable/ic_error}"
+            bind:imgPlaceholder="@{@drawable/ic_loading}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/guide_split"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_publish_date"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:textSize="12sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guide_split"
-        app:layout_constraintTop_toBottomOf="@id/rb_star"
-        tools:text="영화 개봉 일" />
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="start|center_vertical"
+            android:maxLines="1"
+            android:textSize="20sp"
+            android:text="@{item.title}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guide_split"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="영화 제목" />
 
-    <TextView
-        android:id="@+id/tv_director"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guide_split"
-        app:layout_constraintTop_toBottomOf="@id/tv_publish_date"
-        tools:text="영화 감독" />
+        <RatingBar
+            android:id="@+id/rb_star"
+            style="@style/AppRatingBar.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:isIndicator="true"
+            android:numStars="5"
+            android:stepSize="0.5"
+            android:rating="@{item.userRating}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/guide_split"
+            app:layout_constraintTop_toBottomOf="@id/tv_title" />
 
-    <TextView
-        android:id="@+id/tv_actor"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/guide_split"
-        app:layout_constraintTop_toBottomOf="@id/tv_director"
-        app:layout_constraintVertical_bias="0"
-        tools:text="영화 배우" />
+        <TextView
+            android:id="@+id/tv_publish_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textSize="12sp"
+            android:text="@{item.pubDate}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guide_split"
+            app:layout_constraintTop_toBottomOf="@id/rb_star"
+            tools:text="영화 개봉 일" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_director"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textSize="14sp"
+            android:text="@{item.director}"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guide_split"
+            app:layout_constraintTop_toBottomOf="@id/tv_publish_date"
+            tools:text="영화 감독" />
+
+        <TextView
+            android:id="@+id/tv_actor"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:textSize="14sp"
+            android:text="@{item.actor}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guide_split"
+            app:layout_constraintTop_toBottomOf="@id/tv_director"
+            app:layout_constraintVertical_bias="0"
+            tools:text="영화 배우" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
