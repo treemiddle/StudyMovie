@@ -1,6 +1,8 @@
 package com.jay.studymovie.ui.base
 
-interface ViewHolderLifecycle<in Model> {
-    fun bind(item: Model)
+import com.jay.studymovie.ui.model.JayPresentation
+
+interface ViewHolderLifecycle<T : JayPresentation> {
+    fun bind(item: T)
     fun recycle()
 }

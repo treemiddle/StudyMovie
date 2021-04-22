@@ -1,14 +1,23 @@
 package com.jay.studymovie.ui.base
 
+import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.View
+import androidx.annotation.LayoutRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.jay.studymovie.ui.application.JApplication
 
-abstract class BaseActivity<Presenter : JayBasePresenter> : AppCompatActivity(), JayBaseView {
+abstract class BaseActivity<VDB : ViewDataBinding, Presenter : JayBasePresenter>(
+    @LayoutRes
+    val layoutResdId: Int = 0
+) : AppCompatActivity(), JayBaseView {
+    protected lateinit var binding: VDB
     protected abstract val presenter: Presenter
     protected open val commonProgressView: View? = null
     protected val application: JApplication?
@@ -39,6 +48,16 @@ abstract class BaseActivity<Presenter : JayBasePresenter> : AppCompatActivity(),
                 }
             }
         })
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (layoutResdId != 0) {
+            binding = DataBindingUtil.setContentView<VDB>(this, layoutResdId).apply {
+                lifecycleOwner = this@BaseActivity
+            }
+        }
     }
 
     override fun showLoading() {

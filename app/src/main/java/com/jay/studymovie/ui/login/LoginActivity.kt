@@ -8,6 +8,7 @@ import android.widget.ProgressBar
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.textfield.TextInputEditText
 import com.jay.studymovie.R
+import com.jay.studymovie.databinding.ActivityLoginBinding
 import com.jay.studymovie.ui.base.BaseActivity
 import com.jay.studymovie.ui.movie.MovieActivity
 import com.jay.studymovie.utils.ext.toast
@@ -16,12 +17,7 @@ import io.reactivex.subjects.BehaviorSubject
 import io.reactivex.subjects.PublishSubject
 import io.reactivex.subjects.Subject
 
-class LoginActivity : BaseActivity<LoginPresenter>(), LoginContract.View {
-
-    private lateinit var idInputEditText: TextInputEditText
-    private lateinit var passwordInputEditText: TextInputEditText
-    private lateinit var loginButton: Button
-    private lateinit var loadingProgressBar: ProgressBar
+class LoginActivity : BaseActivity<ActivityLoginBinding, LoginPresenter>(R.layout.activity_login), LoginContract.View {
 
     override val presenter: LoginPresenter by lazy {
         LoginPresenter(
@@ -34,27 +30,25 @@ class LoginActivity : BaseActivity<LoginPresenter>(), LoginContract.View {
     private val _loginSubject: Subject<Unit> = PublishSubject.create()
 
     override val commonProgressView: View?
-        get() = loadingProgressBar
+        get() = binding.pgbLoading
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
 
-        initView()
         initListener()
     }
 
     override fun clearError() {
-        idInputEditText.error = null
-        passwordInputEditText.error = null
+        binding.ietId.error = null
+        binding.ietPassword.error = null
     }
 
     override fun showIdError() {
-        idInputEditText.error = getString(R.string.login_fail_id)
+        binding.ietId.error = getString(R.string.login_fail_id)
     }
 
     override fun showPasswordError() {
-        passwordInputEditText.error = getString(R.string.login_fail_password)
+        binding.ietPassword.error = getString(R.string.login_fail_password)
     }
 
     override fun loginSuccess() {
@@ -81,17 +75,17 @@ class LoginActivity : BaseActivity<LoginPresenter>(), LoginContract.View {
         super.onDestroy()
     }
 
-    private fun initView() {
-        idInputEditText = findViewById(R.id.iet_id)
-        passwordInputEditText = findViewById(R.id.iet_password)
-        loginButton = findViewById(R.id.btn_login)
-        loadingProgressBar = findViewById(R.id.pgb_loading)
-    }
-
     private fun initListener() {
-        idInputEditText.addTextChangedListener { onNextId(it.toString()) }
-        passwordInputEditText.addTextChangedListener { onNextPassword(it.toString()) }
-        loginButton.setOnClickListener { onLoginClick() }
+        with(binding) {
+            ietId.addTextChangedListener { onNextId(it.toString()) }
+            ietPassword.addTextChangedListener { onNextPassword(it.toString()) }
+            btnLogin.setOnClickListener {
+                presenter.login(
+                    id = _idSubject.value!!,
+                    password = _passwordSubject.value!!
+                )
+            }
+        }
     }
 
     companion object {
