@@ -1,61 +1,46 @@
 package com.jay.studymovie.ui.movie
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import androidx.core.widget.addTextChangedListener
+import androidx.activity.viewModels
+import androidx.core.net.toUri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.jay.studymovie.R
 import com.jay.studymovie.databinding.ActivityMovieBinding
 import com.jay.studymovie.ui.base.BaseActivity
-import com.jay.studymovie.ui.movie.model.JayMoviePresentation
 
-class MovieActivity : BaseActivity<ActivityMovieBinding, MoviePresenter>(R.layout.activity_movie), MovieContract.View {
-
-    private lateinit var adapter: MovieAdapter
-
-    override val presenter: MoviePresenter by lazy {
-        MoviePresenter(
-            movieRepository = requireApplication().movieRepository,
-            view = this
-        )
+class MovieActivity : BaseActivity<ActivityMovieBinding, MovieViewModel, MovieState>(
+    R.layout.activity_movie
+) {
+    override val viewModel: MovieViewModel by viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return MovieViewModel(
+                    movieRepository = requireApplication().movieRepository
+                ) as T
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        initRecyclerView()
-        queryTexListener()
-        onSearchClick()
+        initAdapter()
     }
 
-    private fun initRecyclerView() {
-        if (!::adapter.isInitialized) {
-            adapter = MovieAdapter(
-                presenter::searchResultClick
-            )
+    override fun onState(newState: MovieState) {
+        when (newState) {
+            is MovieState.ShowMovieLink -> {
+                startActivity(Intent(Intent.ACTION_VIEW).apply {
+                    data = newState.movieLink.toUri()
+                })
+            }
         }
-
-        binding.rvSearchResult.adapter = adapter
     }
 
-    override fun setLatestQuery(query: String) {
-        binding.etQuery.setText(query)
-    }
-
-    override fun showMovieList(items: List<JayMoviePresentation>) {
-        adapter.submitList(items)
-    }
-
-    override fun movieItemClick(uri: Uri) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri.toString())))
-    }
-
-    private fun queryTexListener() = binding.etQuery.addTextChangedListener {
-        presenter.debounceQuery(it.toString())
-    }
-
-    private fun onSearchClick() = binding.btnSearch.setOnClickListener {
-        presenter.buttonClickQuery()
+    private fun initAdapter() {
+        binding.rvSearchResult.adapter = MovieAdapter()
     }
 
 }

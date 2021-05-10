@@ -13,6 +13,8 @@ import com.jay.studymovie.data.local.source.JayMovieLocalDataSourceImpl
 import com.jay.studymovie.data.remote.source.JayMovieRemoteDataSourceImpl
 import com.jay.studymovie.domain.repository.JayAuthRepository
 import com.jay.studymovie.domain.repository.JayMovieRepository
+import com.jay.studymovie.utils.ResourceProvider
+import com.jay.studymovie.utils.ResourceProviderImpl
 import com.uber.rxdogtag.RxDogTag
 import io.reactivex.exceptions.UndeliverableException
 import io.reactivex.plugins.RxJavaPlugins
@@ -24,6 +26,7 @@ class JApplication : Application() {
 
     lateinit var movieRepository: JayMovieRepository
     lateinit var authRepository: JayAuthRepository
+    lateinit var resourceProvider: ResourceProvider
 
     override fun onCreate() {
         super.onCreate()
@@ -59,6 +62,10 @@ class JApplication : Application() {
         movieRepository = MovieRepositoryImpl(
             movieLocalDataSource,
             movieRemoteDataSource
+        )
+
+        resourceProvider = ResourceProviderImpl(
+            this
         )
     }
 

@@ -11,15 +11,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.jay.studymovie.BR
 import com.jay.studymovie.ui.application.JApplication
 
-abstract class BaseActivity<VDB : ViewDataBinding, Presenter : JayBasePresenter>(
+abstract class BaseActivity<VDB : ViewDataBinding, VM : JayViewModel<*>, S : JayState>(
     @LayoutRes
     val layoutResdId: Int = 0
-) : AppCompatActivity(), JayBaseView {
+) : AppCompatActivity() {
     protected lateinit var binding: VDB
-    protected abstract val presenter: Presenter
-    protected open val commonProgressView: View? = null
+    protected abstract val viewModel: VM
     protected val application: JApplication?
         get() = (applicationContext as? JApplication)
 
@@ -28,22 +28,24 @@ abstract class BaseActivity<VDB : ViewDataBinding, Presenter : JayBasePresenter>
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 when (event) {
                     Lifecycle.Event.ON_CREATE -> {
-                        presenter.create()
+                        viewModel.create()
                     }
                     Lifecycle.Event.ON_START -> {
-                        presenter.start()
+                        viewModel.start()
                     }
                     Lifecycle.Event.ON_RESUME -> {
-                        presenter.resume()
+                        viewModel.resume()
                     }
                     Lifecycle.Event.ON_PAUSE -> {
-                        presenter.pause()
+                        viewModel.pause()
                     }
                     Lifecycle.Event.ON_STOP -> {
-                        presenter.stop()
+                        viewModel.stop()
                     }
                     Lifecycle.Event.ON_DESTROY -> {
-                        presenter.destroy()
+                        lifecycle.removeObserver(this)
+                    }
+                    else -> {
                     }
                 }
             }
@@ -56,16 +58,20 @@ abstract class BaseActivity<VDB : ViewDataBinding, Presenter : JayBasePresenter>
         if (layoutResdId != 0) {
             binding = DataBindingUtil.setContentView<VDB>(this, layoutResdId).apply {
                 lifecycleOwner = this@BaseActivity
+                setVariable(BR.viewModel, viewModel)
             }
         }
+
+        viewModel.state.observe(this, {
+            if (it != null && it.isConsumed.compareAndSet(false, true)) {
+                @Suppress("UNCHECKED_CAST")
+                onState(it.event as S)
+            }
+        })
     }
 
-    override fun showLoading() {
-        commonProgressView?.visibility = View.VISIBLE
-    }
+    protected open fun onState(newState: S) {
 
-    override fun hideLoading() {
-        commonProgressView?.visibility = View.INVISIBLE
     }
 
     @Throws(IllegalStateException::class)

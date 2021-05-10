@@ -32,9 +32,9 @@
 
         <activity
             android:name=".ui.movie.MovieActivity"
-            android:theme="@style/Theme.StudyMovie"
             android:exported="false"
-            android:launchMode="singleTop" />
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.StudyMovie" />
 
     </application>
 
