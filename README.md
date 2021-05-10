@@ -1,5 +1,4 @@
-# StudyMovie
-
+# NaverMovie Search Application
 
 
 ### branch name
