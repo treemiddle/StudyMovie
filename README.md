@@ -1,10 +1,13 @@
 # StudyMovie
-___
+
 
 
 ### branch name
 
 * mvc => **mvc로 작성**
+
+
+* mvc-2 => **스플레시, 로그인 적용**
 
 
 * branch-model => **모델 분리**
